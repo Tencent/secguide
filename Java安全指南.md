@@ -494,9 +494,7 @@ ESAPI.encoder().encodeForURL();
 
 为避免校验被绕过，应避免直接对URL进行字符串匹配。应通过通过URL解析函数进行解析，获取host或者domain后和白名单进行比较。
 
-需要注意的是，由于浏览器的容错机制，以下域名中的”\“会被替换成"/",最终跳转到www.baidu.com。而Java的域名解析函数则无此特性。为避免解析不一致导致绕过，建议对host中的"/"和”#“进行替换。
-
-https://www.baidu.com\www.bbb.com
+需要注意的是，由于浏览器的容错机制，域名`https://www.qq.com\www.bbb.com`中的`\`会被替换成`/`，最终跳转到`www.qq.com`。而Java的域名解析函数则无此特性。为避免解析不一致导致绕过，建议对host中的`/`和`#`进行替换。
 
 参考代码：
 
