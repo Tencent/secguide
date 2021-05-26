@@ -113,7 +113,6 @@ func main() {
 
 // good: 判断Data指针是否为nil
 func main() {
-
 	packet := new(Packet)
 	data := make([]byte, 2)
 
@@ -593,7 +592,7 @@ func AesEncrypt(plaintext string) (string, error) {
 crypto/des，crypto/md5，crypto/sha1，crypto/rc4等。
 
 // good
-crypto/rsa，crypto/aes等
+crypto/rsa，crypto/aes等。
 ```
 
 <a id="1.1.7"></a>
@@ -640,15 +639,15 @@ func validateVariable() {
 	if errs != nil {
 		fmt.Println(errs)
 		return
-        //停止执行
+		//停止执行
 	}
 	// 验证通过，继续执行
-    ...
+	...
 }
 
 func main() {
-    validate = validator.New()
-    validateVariable()
+	validate = validator.New()
+	validateVariable()
 }
 ```
 
