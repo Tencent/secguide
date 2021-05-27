@@ -689,7 +689,7 @@ CSRF是指跨站请求伪造（Cross-site request forgery），是web常见的�
   1. 要需要处理Referer为空的情况，当Referer为空则拒绝请求
   2. 注意避免例如qq.com.evil.com 部分匹配的情况。
 
-
+  ​    
 
 - 避免使用GET请求对服务端进行更改
 
@@ -704,7 +704,7 @@ CSRF是指跨站请求伪造（Cross-site request forgery），是web常见的�
 
   这样这种类型的请求是暴露于攻击范围之中的。
 
-
+  ​    
 
 - Samesite Cookie
 
