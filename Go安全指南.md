@@ -718,7 +718,7 @@ func handlerGood(db *sql.DB, req *http.Request) {
 ### 1.3 网络请求
 ####  1.3.1【必须】资源请求过滤验证
 
-- 使用`"net/http"`下的方法`http.Get(url)`、`http.Post(url, contentType, body)`、`http.Head(url )`、`http.PostForm(url, data)`、`http.Do(req)`时，如变量值外部可控（指从参数中动态获取），应对请求目标进行严格的安全校验。
+- 使用`"net/http"`下的方法`http.Get(url)`、`http.Post(url, contentType, body)`、`http.Head(url)`、`http.PostForm(url, data)`、`http.Do(req)`时，如变量值外部可控（指从参数中动态获取），应对请求目标进行严格的安全校验。
 
 - 如请求资源域名归属固定的范围，如只允许`a.qq.com`和`b.qq.com`，应做白名单限制。如不适用白名单，则推荐的校验逻辑步骤是：
 
