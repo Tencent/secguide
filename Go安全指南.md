@@ -40,32 +40,30 @@
 - 在对slice进行操作时，必须判断长度是否合法，防止程序panic
 
 ```go
-// bad: 未判断data的长度，可导致 index out of range 
-func decode(data [] byte) bool {
-    if data[0] == 'F' && data[1] == 'U' && data[2] == 'Z' && data[3] == 'Z' && data[4] == 'E' && data[5] == 'R' {
-        fmt.Println("Bad")
-        return true
-    }
-  
-    return false
+// bad: 未判断data的长度，可导致 index out of range
+func decode(data []byte) bool {
+	if data[0] == 'F' && data[1] == 'U' && data[2] == 'Z' && data[3] == 'Z' && data[4] == 'E' && data[5] == 'R' {
+		fmt.Println("Bad")
+		return true
+	}
+	return false
 }
 
 // bad: slice bounds out of range
 func foo() {
-    var slice = []int{0, 1, 2, 3, 4, 5, 6}
-    fmt.Println(slice[:10]) 
+	var slice = []int{0, 1, 2, 3, 4, 5, 6}
+	fmt.Println(slice[:10])
 }
 
-// good: 使用data前应判断长度是否合法 
-func decode(data [] byte) bool {
-    if len(data) == 6 {
-        if data[0] == 'F' && data[1] == 'U' && data[2] == 'Z' && data[3] == 'Z' && data[4] == 'E' && data[5] == 'R' {
-            fmt.Println("Good")
-            return true
-        }
-    }
-	
-    return false
+// good: 使用data前应判断长度是否合法
+func decode(data []byte) bool {
+	if len(data) == 6 {
+		if data[0] == 'F' && data[1] == 'U' && data[2] == 'Z' && data[3] == 'Z' && data[4] == 'E' && data[5] == 'R' {
+			fmt.Println("Good")
+			return true
+		}
+	}
+	return false
 }
 ```
 
@@ -75,62 +73,59 @@ func decode(data [] byte) bool {
 
 ```go
 type Packet struct {
-    PackeyType        uint8
-    PackeyVersion     uint8
-    Data              *Data
+	PackeyType    uint8
+	PackeyVersion uint8
+	Data          *Data
 }
 
 type Data struct {
-    Stat    uint8
-    Len 	uint8
-    Buf 	[8]byte
+	Stat uint8
+	Len  uint8
+	Buf  [8]byte
 }
 
 func (p *Packet) UnmarshalBinary(b []byte) error {
-    if len(b) < 2 {
-       return io.EOF
-    }
-  
-    p.PackeyType = b[0]
-    p.PackeyVersion = b[1]
-  
-    // 若长度等于2，那么不会new Data
-    if len(b) > 2 {
-        p.Data = new(Data)
-        // Unmarshal(b[i:], p.Data)
-    }
-  
-    return nil
+	if len(b) < 2 {
+		return io.EOF
+	}
+
+	p.PackeyType = b[0]
+	p.PackeyVersion = b[1]
+
+	// 若长度等于2，那么不会new Data
+	if len(b) > 2 {
+		p.Data = new(Data)
+	}
+	return nil
 }
 
 // bad: 未判断指针是否为nil
 func main() {
-    packet := new(Packet)
-    data := make([]byte, 2)
-    if err := packet.UnmarshalBinary(data); err != nil {
-        fmt.Println("Failed to unmarshal packet")
-        return
-    }
-    
-    fmt.Printf("Stat: %v\n", packet.Data.Stat)
+	packet := new(Packet)
+	data := make([]byte, 2)
+	if err := packet.UnmarshalBinary(data); err != nil {
+		fmt.Println("Failed to unmarshal packet")
+		return
+	}
+
+	fmt.Printf("Stat: %v\n", packet.Data.Stat)
 }
 
-// good: 判断Data指针是否未nil
+// good: 判断Data指针是否为nil
 func main() {
-    
-    packet := new(Packet)
-    data := make([]byte, 2)
-    
-    if err := packet.UnmarshalBinary(data); err != nil {
-        fmt.Println("Failed to unmarshal packet")
-        return
-    }
-    
-    if packet.Data == nil {
-        return
-    }
-    
-    fmt.Printf("Stat: %v\n", packet.Data.Stat)
+	packet := new(Packet)
+	data := make([]byte, 2)
+
+	if err := packet.UnmarshalBinary(data); err != nil {
+		fmt.Println("Failed to unmarshal packet")
+		return
+	}
+
+	if packet.Data == nil {
+		return
+	}
+
+	fmt.Printf("Stat: %v\n", packet.Data.Stat)
 }
 ```
 
@@ -150,30 +145,30 @@ func main() {
 ```go
 // bad: 未限制长度，导致整数溢出
 func overflow(numControlByUser int32) {
-    var numInt int32 = 0
-    numInt = numControlByUser + 1
-    //对长度限制不当，导致整数溢出
-    fmt.Printf("%d\n", numInt)
-    //使用numInt，可能导致其他错误
+	var numInt int32 = 0
+	numInt = numControlByUser + 1
+	// 对长度限制不当，导致整数溢出
+	fmt.Printf("%d\n", numInt)
+	// 使用numInt，可能导致其他错误
 }
 
 func main() {
-    overflow(2147483647)
+	overflow(2147483647)
 }
 
-// good: 
+// good
 func overflow(numControlByUser int32) {
-    var numInt int32 = 0
-    numInt = numControlByUser + 1
-    if numInt < 0 {
-        fmt.Println("integer overflow")
-        return;
-    } 
-    fmt.Println("integer ok")
+	var numInt int32 = 0
+	numInt = numControlByUser + 1
+	if numInt < 0 {
+		fmt.Println("integer overflow")
+		return
+	}
+	fmt.Println("integer ok")
 }
 
 func main() {
-    overflow(2147483647)
+	overflow(2147483647)
 }
 ```
 
@@ -183,23 +178,23 @@ func main() {
 
 ```go
 // bad
-func parse(lenControlByUser int, data[] byte) {
-    size := lenControlByUser
-    //对外部传入的size，进行长度判断以免导致panic
-    buffer := make([]byte, size)
-    copy(buffer, data)
+func parse(lenControlByUser int, data []byte) {
+	size := lenControlByUser
+	// 对外部传入的size，进行长度判断以免导致panic
+	buffer := make([]byte, size)
+	copy(buffer, data)
 }
 
 // good
-func parse(lenControlByUser int, data[] byte) ([]byte, error){
-    size := lenControlByUser
-    //限制外部可控的长度大小范围
-    if size > 64*1024*1024 {
-        return nil, errors.New("value too large")
-    }
-    buffer := make([]byte, size)
-    copy(buffer, data)
-    return buffer, nil
+func parse(lenControlByUser int, data []byte) ([]byte, error) {
+	size := lenControlByUser
+	// 限制外部可控的长度大小范围
+	if size > 64*1024*1024 {
+		return nil, errors.New("value too large")
+	}
+	buffer := make([]byte, size)
+	copy(buffer, data)
+	return buffer, nil
 }
 ```
 
@@ -209,25 +204,26 @@ func parse(lenControlByUser int, data[] byte) ([]byte, error){
 ```go
 // bad
 func foo() {
-    var a, b Data
-    a.o = &b
-    b.o = &a
+	var a, b Data
+	a.o = &b
+	b.o = &a
 
-    //指针循环引用，SetFinalizer()无法正常调用
-    runtime.SetFinalizer(&a, func(d *Data) {
-        fmt.Printf("a %p final.\n", d)
-    })
-    runtime.SetFinalizer(&b, func(d *Data) {
-        fmt.Printf("b %p final.\n", d)
-    })
+	// 指针循环引用，SetFinalizer()无法正常调用
+	runtime.SetFinalizer(&a, func(d *Data) {
+		fmt.Printf("a %p final.\n", d)
+	})
+	runtime.SetFinalizer(&b, func(d *Data) {
+		fmt.Printf("b %p final.\n", d)
+	})
 }
 
 func main() {
-    for {
-        foo()
-        time.Sleep(time.Millisecond)
-    }
+	for {
+		foo()
+		time.Sleep(time.Millisecond)
+	}
 }
+
 ```
 
 #### 1.1.6【必须】禁止重复释放channel
@@ -236,25 +232,25 @@ func main() {
 ```go
 // bad
 func foo(c chan int) {
-    defer close(c)
-    err := processBusiness()
-    if err != nil {
-        c <- 0
-        close(c) // 重复释放channel
-        return
-    }
-    c <- 1
+	defer close(c)
+	err := processBusiness()
+	if err != nil {
+		c <- 0
+		close(c) // 重复释放channel
+		return
+	}
+	c <- 1
 }
 
 // good
 func foo(c chan int) {
-    defer close(c) // 使用defer延迟关闭channel
-    err := processBusiness()
-    if err != nil {
-        c <- 0
-        return
-    }
-    c <- 1
+	defer close(c) // 使用defer延迟关闭channel
+	err := processBusiness()
+	if err != nil {
+		c <- 0
+		return
+	}
+	c <- 1
 }
 ```
 
@@ -264,10 +260,10 @@ func foo(c chan int) {
 ```go
 // bad: 协程没有设置退出条件
 func doWaiter(name string, second int) {
-    for {
-        time.Sleep(time.Duration(second) * time.Second)
-        fmt.Println(name, " is ready!")
-    }
+	for {
+		time.Sleep(time.Duration(second) * time.Second)
+		fmt.Println(name, " is ready!")
+	}
 }
 ```
 
@@ -277,12 +273,13 @@ func doWaiter(name string, second int) {
 ```go
 // bad: 通过unsafe操作原始指针
 func unsafePointer() {
-    b := make([]byte, 1)
-    foo := (*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&b[0])) + uintptr(0xfffffffe)))
-    fmt.Print(*foo + 1)
+	b := make([]byte, 1)
+	foo := (*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&b[0])) + uintptr(0xfffffffe)))
+	fmt.Print(*foo + 1)
 }
 
 // [signal SIGSEGV: segmentation violation code=0x1 addr=0xc100068f55 pc=0x49142b]
+
 ```
 
 #### 1.1.9【推荐】不使用slice作为函数入参
@@ -290,32 +287,30 @@ func unsafePointer() {
 - slice是引用类型，在作为函数入参时采用的是地址传递，对slice的修改也会影响原始数据
 
 ```go
-  // bad
-  // slice作为函数入参时是地址传递
-  func modify(array []int) {
-      array[0] = 10 // 对入参slice的元素修改会影响原始数据
-  }
-  
-  func main() {
-      array := []int{1, 2, 3, 4, 5}
-  
-      modify(array)
-      fmt.Println(array) // output：[10 2 3 4 5]
-  }
+// bad: slice作为函数入参时是地址传递
+func modify(array []int) {
+	array[0] = 10 // 对入参slice的元素修改会影响原始数据
+}
 
-  // good
-  // 数组作为函数入参时，而不是slice
-  func modify(array [5]int) {
-    array[0] = 10
-  }
+func main() {
+	array := []int{1, 2, 3, 4, 5}
 
-  func main() {
-      // 传入数组，注意数组与slice的区别
-      array := [5]int{1, 2, 3, 4, 5}
-  
-      modify(array)
-      fmt.Println(array)
-  }
+	modify(array)
+	fmt.Println(array) // output：[10 2 3 4 5]
+}
+
+// good: 函数使用数组作为入参，而不是slice
+func modify(array [5]int) {
+	array[0] = 10
+}
+
+func main() {
+	// 传入数组，注意数组与slice的区别
+	array := [5]int{1, 2, 3, 4, 5}
+
+	modify(array)
+	fmt.Println(array)
+}
 ```
 
 <a id="1.1.2"></a>
@@ -356,9 +351,11 @@ func unzipGood(f string) bool {
 		return false
 	}
 	for _, f := range r.File {
-		p, _ := filepath.Abs(f.Name)
-		if !strings.Contains(p, "..") {
+		if !strings.Contains(f.Name, "..") {
+			p, _ := filepath.Abs(f.Name)
 			ioutil.WriteFile(p, []byte("present"), 0640)
+		} else {
+			return false
 		}
 	}
 	return true
@@ -386,13 +383,13 @@ func foo() {
 	userInputedVal := "&& echo 'hello'" // 假设外部传入该变量值
 	cmdName := "ping " + userInputedVal
 
-	//未判断外部输入是否存在命令注入字符，结合sh可造成命令注入
+	// 未判断外部输入是否存在命令注入字符，结合sh可造成命令注入
 	cmd := exec.Command("sh", "-c", cmdName)
 	output, _ := cmd.CombinedOutput()
 	fmt.Println(string(output))
 
 	cmdName := "ls"
-	//未判断外部输入是否是预期命令
+	// 未判断外部输入是否是预期命令
 	cmd := exec.Command(cmdName)
 	output, _ := cmd.CombinedOutput()
 	fmt.Println(string(output))
@@ -432,13 +429,13 @@ func main() {
 ```go
 // good
 func main() {
-  http.HandleFunc("/", func (w http.ResponseWriter, req *http.Request) {
-    w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
-    w.Write([]byte("This is an example server.\n"))
-  })
+	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+		w.Write([]byte("This is an example server.\n"))
+	})
 
-  //服务器配置证书与私钥
-  log.Fatal(http.ListenAndServeTLS(":443", "yourCert.pem", "yourKey.pem", nil))
+	// 服务器配置证书与私钥
+	log.Fatal(http.ListenAndServeTLS(":443", "yourCert.pem", "yourKey.pem", nil))
 }
 ```
 
@@ -532,21 +529,18 @@ func serve1() {
 
 ```go
 defer func () {
-        if r := recover(); r != nil {
-            fmt.Println("Recovered in start()")
-        }
-    }()
+	if r := recover(); r != nil {
+		fmt.Println("Recovered in start()")
+	}
+}()
 ```
 
 - 对外环境禁止开启debug模式，或将程序运行日志输出到前端
 
-错误例子：
 ```bash
+// bad
 dlv --listen=:2345 --headless=true --api-version=2 debug test.go
-```
-
-正确例子：
-```bash
+// good
 dlv debug test.go
 ```
 
@@ -593,10 +587,12 @@ func AesEncrypt(plaintext string) (string, error) {
 
 - 在使用加密算法时，不建议使用加密强度较弱的算法。
 
-错误例子：
-
 ```
+// bad
 crypto/des，crypto/md5，crypto/sha1，crypto/rc4等。
+
+// good
+crypto/rsa，crypto/aes等。
 ```
 
 <a id="1.1.7"></a>
@@ -605,13 +601,14 @@ crypto/des，crypto/md5，crypto/sha1，crypto/rc4等。
 #### 1.7.1【推荐】使用regexp进行正则表达式匹配
 
 - 正则表达式编写不恰当可被用于DoS攻击，造成服务不可用，推荐使用regexp包进行正则表达式匹配。regexp保证了线性时间性能和优雅的失败：对解析器、编译器和执行引擎都进行了内存限制。但regexp不支持以下正则表达式特性，如业务依赖这些特性，则regexp不适合使用。
-  - 回溯引用[Backreferences](https://www.regular-expressions.info/backref.html)和查看[Lookaround](https://www.regular-expressions.info/lookaround.html)
+  - 回溯引用[Backreferences](https://www.regular-expressions.info/backref.html)
+  - 查看[Lookaround](https://www.regular-expressions.info/lookaround.html)
 
 ```go
 // good
 matched, err := regexp.MatchString(`a.b`, "aaxbb")
 fmt.Println(matched) // true
-fmt.Println(err)     // nil (regexp is valid)
+fmt.Println(err)     // nil
 ```
 
 <a id="2"></a>
@@ -635,32 +632,37 @@ import (
 )
 
 var validate *validator.Validate
-validate = validator.New()
+
 func validateVariable() {
 	myEmail := "abc@tencent.com"
 	errs := validate.Var(myEmail, "required,email")
 	if errs != nil {
 		fmt.Println(errs)
 		return
-        //停止执行
+		//停止执行
 	}
 	// 验证通过，继续执行
-    ...
+	...
+}
+
+func main() {
+	validate = validator.New()
+	validateVariable()
 }
 ```
 
 - 无法通过白名单校验的应使用`html.EscapeString`、`text/template`或`bluemonday`对`<, >, &, ',"`等字符进行过滤或编码
 
 ```go
-  import(
-  	"text/template"
-  )
-  
-  // TestHTMLEscapeString HTML特殊字符转义
-  func main(inputValue string) string{
-  	escapedResult := template.HTMLEscapeString(inputValue)
-  	return escapedResult
-  }
+import (
+	"text/template"
+)
+
+// TestHTMLEscapeString HTML特殊字符转义
+func main(inputValue string) string {
+	escapedResult := template.HTMLEscapeString(inputValue)
+	return escapedResult
+}
 ```
 
 <a id="2.1.2"></a>
@@ -671,42 +673,44 @@ func validateVariable() {
 - 使用`database/sql`的prepare、Query或使用GORM等ORM执行SQL操作
 
 ```go
-  import (
-    "github.com/jinzhu/gorm"
-    _ "github.com/jinzhu/gorm/dialects/sqlite"
-  )
-  
-  type Product struct {
-    gorm.Model
-    Code string
-    Price uint
-  }
-  ...
-  var product Product
-  db.First(&product, 1)
+import (
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+)
+
+type Product struct {
+	gorm.Model
+	Code  string
+	Price uint
+}
+
+...
+var product Product
+...
+db.First(&product, 1)
 ```
 
 - 使用参数化查询，禁止拼接SQL语句，另外对于传入参数用于order by或表名的需要通过校验
 
 ```go
 // bad
-  import (
-  	"database/sql"
-  	"fmt"
-  	"net/http"
-  )
-  
-  func handler(db *sql.DB, req *http.Request) {
-  	q := fmt.Sprintf("SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY='%s' ORDER BY PRICE",
-  		req.URL.Query()["category"])
-  	db.Query(q)
-  }
+import (
+	"database/sql"
+	"fmt"
+	"net/http"
+)
+
+func handler(db *sql.DB, req *http.Request) {
+	q := fmt.Sprintf("SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY='%s' ORDER BY PRICE",
+		req.URL.Query()["category"])
+	db.Query(q)
+}
 
 // good
 func handlerGood(db *sql.DB, req *http.Request) {
-    //使用?占位符
-  	q := "SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY='?' ORDER BY PRICE"
-  	db.Query(q, req.URL.Query()["category"])
+	// 使用?占位符
+	q := "SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY='?' ORDER BY PRICE"
+	db.Query(q, req.URL.Query()["category"])
 }
 ```
 
@@ -714,7 +718,7 @@ func handlerGood(db *sql.DB, req *http.Request) {
 ### 1.3 网络请求
 ####  1.3.1【必须】资源请求过滤验证
 
-- 使用`"net/http"`下的方法`http.Get(url)`、`http.Post(url, contentType, body)`、`http.Head(url )`、`http.PostForm(url, data)`、`http.Do(req)`时，如变量值外部可控（指从参数中动态获取），应对请求目标进行严格的安全校验。
+- 使用`"net/http"`下的方法`http.Get(url)`、`http.Post(url, contentType, body)`、`http.Head(url)`、`http.PostForm(url, data)`、`http.Do(req)`时，如变量值外部可控（指从参数中动态获取），应对请求目标进行严格的安全校验。
 
 - 如请求资源域名归属固定的范围，如只允许`a.qq.com`和`b.qq.com`，应做白名单限制。如不适用白名单，则推荐的校验逻辑步骤是：
 
@@ -733,38 +737,38 @@ func handlerGood(db *sql.DB, req *http.Request) {
     192.168.0.0/16
     127.0.0.0/8
     ```
-    
+
   - 第 5 步、请求URL
-    
+
   - 第 6 步、如有跳转，跳转后执行1，否则绑定经校验的ip和域名，对URL发起请求
 
 - 官方库`encoding/xml`不支持外部实体引用，使用该库可避免xxe漏洞
 
 ```go
-  import (
-  	"encoding/xml"
-  	"fmt"
-      "os"
-  )
-  
-  func main() {
-  	type Person struct {
-  		XMLName   xml.Name `xml:"person"`
-  		Id        int      `xml:"id,attr"`
-  		UserName string   `xml:"name>first"`
-  		Comment string `xml:",comment"`
-  	}
-  
-  	v := &Person{Id: 13, UserName: "John"}
-  	v.Comment = " Need more details. "
-  
-  	enc := xml.NewEncoder(os.Stdout)
-  	enc.Indent("  ", "    ")
-  	if err := enc.Encode(v); err != nil {
-  		fmt.Printf("error: %v\n", err)
-  	}
-  
-  }
+import (
+	"encoding/xml"
+	"fmt"
+	"os"
+)
+
+func main() {
+	type Person struct {
+		XMLName  xml.Name `xml:"person"`
+		Id       int      `xml:"id,attr"`
+		UserName string   `xml:"name>first"`
+		Comment  string   `xml:",comment"`
+	}
+
+	v := &Person{Id: 13, UserName: "John"}
+	v.Comment = " Need more details. "
+
+	enc := xml.NewEncoder(os.Stdout)
+	enc.Indent("  ", "    ")
+	if err := enc.Encode(v); err != nil {
+		fmt.Printf("error: %v\n", err)
+	}
+
+}
 ```
 
 <a id="2.1.4"></a>
@@ -774,58 +778,60 @@ func handlerGood(db *sql.DB, req *http.Request) {
 - 使用`text/template`或者`html/template`渲染模板时禁止将外部输入参数引入模板，或仅允许引入白名单内字符。
 
 ```go
-   // bad
-    func handler(w http.ResponseWriter, r *http.Request) {
-      r.ParseForm()
-      x := r.Form.Get("name")
-     
-      var tmpl = `<!DOCTYPE html><html><body>
+// bad
+func handler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	x := r.Form.Get("name")
+
+	var tmpl = `<!DOCTYPE html><html><body>
     <form action="/" method="post">
         First name:<br>
     <input type="text" name="name" value="">
     <input type="submit" value="Submit">
     </form><p>` + x + ` </p></body></html>`
-    
-      t := template.New("main")
-      t, _ = t.Parse(tmpl)
-      t.Execute(w, "Hello")
-    }
+
+	t := template.New("main")
+	t, _ = t.Parse(tmpl)
+	t.Execute(w, "Hello")
+}
 
 // good
-    import (
-    	"fmt"
-    	"github.com/go-playground/validator/v10"
-    )
+import (
+	"fmt"
+	"github.com/go-playground/validator/v10"
+)
 
-    var validate *validator.Validate
-    validate = validator.New()
-    func validateVariable(val) {
-    	errs := validate.Var(val, "gte=1,lte=100")//限制必须是1-100的正整数
-    	if errs != nil {
-    		fmt.Println(errs)
-    		return False
-    	}
-        return True
-    }
-    
-    func handler(w http.ResponseWriter, r *http.Request) {
-        r.ParseForm()
-        x := r.Form.Get("name")
-    
-        if validateVariable(x):
-            var tmpl = `<!DOCTYPE html><html><body>
+var validate *validator.Validate
+validate = validator.New()
+
+func validateVariable(val) {
+	errs := validate.Var(val, "gte=1,lte=100") // 限制必须是1-100的正整数
+	if errs != nil {
+		fmt.Println(errs)
+		return false
+	}
+	return true
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	x := r.Form.Get("name")
+
+	if validateVariable(x) {
+		var tmpl = `<!DOCTYPE html><html><body>
             <form action="/" method="post">
             First name:<br>
             <input type="text" name="name" value="">
             <input type="submit" value="Submit">
             </form><p>` + x + ` </p></body></html>`
-            t := template.New("main")
-            t, _ = t.Parse(tmpl)
-            t.Execute(w, "Hello")
-        else:
-            ...
-    }
-    
+		t := template.New("main")
+		t, _ = t.Parse(tmpl)
+		t.Execute(w, "Hello")
+	} else {
+		// ...
+	}
+}
+
 ```
 
 <a id="2.1.5"></a>
@@ -835,15 +841,15 @@ func handlerGood(db *sql.DB, req *http.Request) {
 - CORS请求保护不当可导致敏感信息泄漏，因此应当严格设置Access-Control-Allow-Origin使用同源策略进行保护。
 
 ```go
- // good
-  c := cors.New(cors.Options{
-      AllowedOrigins: []string{"http://qq.com", "https://qq.com"},
-      AllowCredentials: true,
-      Debug: false,
-  })
-  
-  //引入中间件
-  handler = c.Handler(handler)
+// good
+c := cors.New(cors.Options{
+	AllowedOrigins:   []string{"http://qq.com", "https://qq.com"},
+	AllowCredentials: true,
+	Debug:            false,
+})
+
+// 引入中间件
+handler = c.Handler(handler)
 ```
 
 <a id="2.1.6"></a>
@@ -867,15 +873,15 @@ func handlerGood(db *sql.DB, req *http.Request) {
 - 直出html页面或使用模板生成html页面的，推荐使用`text/template`自动编码，或者使用`html.EscapeString`或`text/template`对`<, >, &, ',"`等字符进行编码。
 
 ```go
-import(
+import (
 	"html/template"
-)        
+)
 
-func outtemplate(w http.ResponseWriter,r *http.Request) {
-    param1 := r.URL.Query().Get("param1")
-    tmpl := template.New("hello")
-    tmpl, _ = tmpl.Parse(`{{define "T"}}{{.}}{{end}}`)
-    tmpl.ExecuteTemplate(w, "T", param1)
+func outtemplate(w http.ResponseWriter, r *http.Request) {
+	param1 := r.URL.Query().Get("param1")
+	tmpl := template.New("hello")
+	tmpl, _ = tmpl.Parse(`{{define "T"}}{{.}}{{end}}`)
+	tmpl.ExecuteTemplate(w, "T", param1)
 }
 ```
 
@@ -887,38 +893,41 @@ func outtemplate(w http.ResponseWriter,r *http.Request) {
 - 用户登录时应重新生成session，退出登录后应清理session。
 ```go
 import (
-	"net/http"
-	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"net/http"
 )
 
-//创建cookie
+// 创建cookie
 func setToken(res http.ResponseWriter, req *http.Request) {
-    expireToken := time.Now().Add(time.Minute * 30).Unix()
-    expireCookie := time.Now().Add(time.Minute * 30)
-    ...
-    cookie := http.Cookie{
-        Name: "Auth",
-        Value: signedToken,
-        Expires: expireCookie, // 过期失效
-        HttpOnly: true,
-        Path: "/",
-        Domain: "127.0.0.1",
-        Secure: true
-    }
+	expireToken := time.Now().Add(time.Minute * 30).Unix()
+	expireCookie := time.Now().Add(time.Minute * 30)
 
-    http.SetCookie(res, &cookie)
-    http.Redirect(res, req, "/profile", 307)
+	//...
+
+	cookie := http.Cookie{
+		Name:     "Auth",
+		Value:    signedToken,
+		Expires:  expireCookie, // 过期失效
+		HttpOnly: true,
+		Path:     "/",
+		Domain:   "127.0.0.1",
+		Secure:   true,
+	}
+
+	http.SetCookie(res, &cookie)
+	http.Redirect(res, req, "/profile", 307)
 }
+
 // 删除cookie
 func logout(res http.ResponseWriter, req *http.Request) {
-    deleteCookie := http.Cookie{
-        Name: "Auth",
-        Value: "none",
-        Expires: time.Now()
-    }
-    http.SetCookie(res, &deleteCookie)
-    return
+	deleteCookie := http.Cookie{
+		Name:    "Auth",
+		Value:   "none",
+		Expires: time.Now(),
+	}
+	http.SetCookie(res, &deleteCookie)
+	return
 }
 ```
 
@@ -929,18 +938,18 @@ func logout(res http.ResponseWriter, req *http.Request) {
 ```go
 // good
 import (
-    "net/http"
-    "github.com/gorilla/csrf"
-    "github.com/gorilla/mux"
+	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
+	"net/http"
 )
 
 func main() {
-    r := mux.NewRouter()
-    r.HandleFunc("/signup", ShowSignupForm)
-    r.HandleFunc("/signup/post", SubmitSignupForm)
-    //使用csrf_token验证
-    http.ListenAndServe(":8000",
-        csrf.Protect([]byte("32-byte-long-auth-key"))(r))
+	r := mux.NewRouter()
+	r.HandleFunc("/signup", ShowSignupForm)
+	r.HandleFunc("/signup/post", SubmitSignupForm)
+	// 使用csrf_token验证
+	http.ListenAndServe(":8000",
+		csrf.Protect([]byte("32-byte-long-auth-key"))(r))
 }
 ```
 
@@ -972,37 +981,37 @@ func main() {
 ```go
 // bad
 func main() {
-    runtime.GOMAXPROCS(runtime.NumCPU())
-    var group sync.WaitGroup
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	var group sync.WaitGroup
 
-    for i := 0; i < 5; i++ {
-        group.Add(1)
-        go func() {
-            defer group.Done()
-            fmt.Printf("%-2d", i) //这里打印的i不是所期望的
-        }()
-    }
-    group.Wait()
+	for i := 0; i < 5; i++ {
+		group.Add(1)
+		go func() {
+			defer group.Done()
+			fmt.Printf("%-2d", i) // 这里打印的i不是所期望的
+		}()
+	}
+	group.Wait()
 }
 
 // good
 func main() {
-    runtime.GOMAXPROCS(runtime.NumCPU())
-    var group sync.WaitGroup
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	var group sync.WaitGroup
 
-    for i := 0; i < 5; i++ {
-        group.Add(1)
-        go func(j int) {
-            defer func() {
-                if r := recover(); r != nil {
-                    fmt.Println("Recovered in start()")
-                }
-                group.Done()
-            }()
-        fmt.Printf("%-2d", j) // 闭包内部使用局部变量
-        }(i)  // 把循环变量显式地传给协程
-    }
-    group.Wait()
+	for i := 0; i < 5; i++ {
+		group.Add(1)
+		go func(j int) {
+			defer func() {
+				if r := recover(); r != nil {
+					fmt.Println("Recovered in start()")
+				}
+				group.Done()
+			}()
+			fmt.Printf("%-2d", j) // 闭包内部使用局部变量
+		}(i) // 把循环变量显式地传给协程
+	}
+	group.Wait()
 }
 ```
 
@@ -1013,10 +1022,10 @@ func main() {
 // bad
 func main() {
 	m := make(map[int]int)
-	//并发读写
+	// 并发读写
 	go func() {
 		for {
-			_ = m[1] 
+			_ = m[1]
 		}
 	}()
 	go func() {
@@ -1036,27 +1045,28 @@ func main() {
 ```go
 // good
 var count int
+
 func Count(lock *sync.Mutex) {
-    lock.Lock()// 加写锁
-    count++
-    fmt.Println(count)
-    lock.Unlock()// 解写锁，任何一个Lock()或RLock()均需要保证对应有Unlock()或RUnlock()
+	lock.Lock() // 加写锁
+	count++
+	fmt.Println(count)
+	lock.Unlock() // 解写锁，任何一个Lock()或RLock()均需要保证对应有Unlock()或RUnlock()
 }
 
 func main() {
-    lock := &sync.Mutex{}
-    for i := 0; i < 10; i++ {
-        go Count(lock) //传递指针是为了防止函数内的锁和调用锁不一致
-    }
-    for {
-        lock.Lock()
-        c := count
-        lock.Unlock()
-        runtime.Gosched()//交出时间片给协程
-        if c > 10 {
-            break
-        }
-    }
+	lock := &sync.Mutex{}
+	for i := 0; i < 10; i++ {
+		go Count(lock) // 传递指针是为了防止函数内的锁和调用锁不一致
+	}
+	for {
+		lock.Lock()
+		c := count
+		lock.Unlock()
+		runtime.Gosched() // 交出时间片给协程
+		if c > 10 {
+			break
+		}
+	}
 }
 ```
 - 使用`sync/atomic`执行原子操作
@@ -1086,7 +1096,7 @@ func main() {
 			m2[k] = v
 		}
 		m2[key] = val
-		m.Store(m2)   // 用新的替代当前对象
+		m.Store(m2) // 用新的替代当前对象
 	}
 	_, _ = read, insert
 }
