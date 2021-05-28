@@ -31,19 +31,7 @@
 
 ## 贡献
 
-欢迎通过Issue或PR的方式提交修订建议，示例如下：
-
-```
-标题：#JavaScript# 规范1.3.1条修订建议
-
-内容：
-1、问题描述
-JavaScript代码安全规范的【1.3.1条】赋值或更新HTML属性部分，需补充
-
-2、解决建议
-应补充下列风险点：
-area.href、input.formaction、button.formaction
-```
+盼与社区携手，一道维护完善。欢迎提交修订建议，详参阅[贡献指南](./CONTRIBUTING.md)。
 
 
 
