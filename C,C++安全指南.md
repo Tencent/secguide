@@ -1410,7 +1410,7 @@ int main() {
 错误（该例子在计算时产生整数溢出）
 
 ```c++
-const kMicLen = 4;
+const int kMicLen = 4;
 // 整数溢出
 void Foo() {
   int len = 1;
