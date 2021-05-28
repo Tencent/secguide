@@ -442,7 +442,7 @@ admin_login_url = "xxxx/ranD0Str"
 
 #### 1.11.2【建议】遵循Flask安全规范
 
-- 参考Flask文档中的安全注意事项 https://flask.palletsprojects.com/en/master/security/
+- 参考Flask文档中的安全注意事项 https://flask.palletsprojects.com/en/latest/security/
 
 
 ### 1.12 Django安全
