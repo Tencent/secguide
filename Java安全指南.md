@@ -474,7 +474,7 @@ reader.setFeature("http://xml.org/sax/features/external-parameter-entities", fal
 | 输出点在URL属性中                                            | 对这些数据进行URL编码<br/>Tips：除此之外，所有链接类属性应该校验其协议。禁止JavaScript、data和Vb伪协议。 |
 
 
-以上编码规则相对较为繁琐，可参考或直接使用业界已有成熟第三方库如ESAPI.其提供一下函数对象上表中的编码规则:
+以上编码规则相对较为繁琐，可参考或直接使用业界已有成熟第三方库如ESAPI.其提供以下函数对象上表中的编码规则:
 
 ```java
 ESAPI.encoder().encodeForHTML();
