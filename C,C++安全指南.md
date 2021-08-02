@@ -1416,8 +1416,8 @@ void Foo() {
   int len = 1;
   char payload[10] = { 0 };
   char dst[10] = { 0 };
-  // Bad, 由于len小于4字节，导致计算拷贝长度时，整数溢出
-  // len - MIC_LEN == 0xfffffffd
+  // Bad, 由于len小于4，导致计算拷贝长度时，整数溢出
+  // len - kMicLen == 0xfffffffd
   memcpy(dst, payload, len - kMicLen);
 }
 ```
@@ -1573,7 +1573,7 @@ void Foo() {
 ```c++
 void Foo(int index) {
   int a[30] = {0};
-  // 此处index是int型，只考虑了index小于数组大小，但是并未判断是否大于0
+  // 此处index是int型，只考虑了index小于数组大小，但是并未判断是否大于等于0
   if (index < 30) {
     // 如果index为负数，则越界
     a[index] = 1;
@@ -1587,7 +1587,7 @@ void Foo(int index) {
 void Foo(int index) {
   int a[30] = {0};
   // 判断index的最大最小值
-  if (index >=0 && index < 30) {
+  if (index >= 0 && index < 30) {
     a[index] = 1;
   }
 }
@@ -1734,9 +1734,8 @@ void Foo(char* bar) {
 void foo() {
   char* p = (char*)malloc(100);
   memcpy(p, "hello", 6);
-  // 此时p所指向的内存已被释放，但是p所指的地址仍然不变
   printf("%s\n", p);
-  free(p);
+  free(p); // 此时p所指向的内存已被释放，但是p所指的地址仍然不变
   // 未设置为NULL，可能导致UAF等内存错误
 
   if (p != NULL) {  // 没有起到防错作用
@@ -1882,11 +1881,11 @@ void Risk() {
 void Safe() {
   fool_u_ptr = make_unique<Foo>(1);
   // 调用<Foo>(1)的函数
-  fool_u_ptr->function();
+  fool_u_ptr->Function();
 
   fool_u_ptr = make_unique<Foo>(2);
   // 调用<Foo>(2)的函数
-  fool_u_ptr->function();
+  fool_u_ptr->Function();
 }
 
 // 输出：
