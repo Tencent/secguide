@@ -1498,10 +1498,6 @@ strncat(fullname, lastname, sizeof(fullname) - strlen(fullname) - 1);
 错误：
 
 ```c++
-double divide(double x, double y) {
-  return x / y;
-}
-
 int divide(int x, int y) {
   return x / y;
 }
@@ -1510,7 +1506,7 @@ int divide(int x, int y) {
 正确：
 
 ```c++
-double divide(double x, double y) {
+int divide(int x, int y) {
   if (y == 0) {
     throw DivideByZero;
   }
