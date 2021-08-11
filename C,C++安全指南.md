@@ -530,7 +530,7 @@ int foo(int* bar) {
 
 #ifdef DEBUG
   if (bar && *bar == 5) {
-    OutputDebugInfo("Wrong value for bar.\n", bar, *bar);
+    OutputDebugInfo("Wrong value for bar.\n");
   }
 #endif
 
