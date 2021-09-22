@@ -68,7 +68,7 @@ function htmlEncode(iStr) {
 	return sStr;
 }
 
-const { user } = params;
+let { user } = params;
 user = htmlEncode(user);
 // ...
 text.innerHTML = `Follow @${user}`;
