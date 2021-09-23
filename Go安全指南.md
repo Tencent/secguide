@@ -284,33 +284,36 @@ func unsafePointer() {
 
 #### 1.1.9【推荐】不使用slice作为函数入参
 
-- slice是引用类型，在作为函数入参时采用的是地址传递，对slice的修改也会影响原始数据
+- slice在作为函数入参时，函数内对slice的修改可能会影响原始数据
 
 ```go
-// bad: slice作为函数入参时是地址传递
-func modify(array []int) {
-	array[0] = 10 // 对入参slice的元素修改会影响原始数据
-}
+  // bad
+  // slice作为函数入参时包含原始数组指针
+  func modify(array []int) {
+      array[0] = 10 // 对入参slice的元素修改会影响原始数据
+  }
+  
+  func main() {
+      array := []int{1, 2, 3, 4, 5}
+  
+      modify(array)
+      fmt.Println(array) // output：[10 2 3 4 5]
+  }
 
-func main() {
-	array := []int{1, 2, 3, 4, 5}
+  // good
+  // 数组作为函数入参，而不是slice
+  func modify(array [5]int) {
+    array[0] = 10
+  }
 
-	modify(array)
-	fmt.Println(array) // output：[10 2 3 4 5]
-}
-
-// good: 函数使用数组作为入参，而不是slice
-func modify(array [5]int) {
-	array[0] = 10
-}
-
-func main() {
-	// 传入数组，注意数组与slice的区别
-	array := [5]int{1, 2, 3, 4, 5}
-
-	modify(array)
-	fmt.Println(array)
-}
+  func main() {
+      // 传入数组，注意数组与slice的区别
+      array := [5]int{1, 2, 3, 4, 5}
+  
+      modify(array)
+      fmt.Println(array)
+  }
+  
 ```
 
 <a id="1.1.2"></a>
