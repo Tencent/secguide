@@ -146,7 +146,6 @@ public class MainActivity extends Activity {
 ```
 ##### 1.3.4 【建议】setSavePassword 方法调用
 建议 setSavePassword 的设置为 false ，避免明文保存网站密码。
-建议禁止使用 File 域协议，以避免过滤不当导致敏感信息泄露。
 ```java
 public class MainActivity extends Activity {
 
