@@ -232,6 +232,10 @@ for char in badchars:
 result = os.system("nslookup " + shlex.quote(domain))
 ```
 
+#### 1.3.3 【必须】禁止不安全的代码执行
+
+* 禁止使用 `eval` 函数处理存在外部输入的数据。
+
 ### 1.4 XML读写
 
 #### 1.4.1 【必须】禁用外部实体的方法
