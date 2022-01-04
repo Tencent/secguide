@@ -643,7 +643,7 @@ web view层通常通过模板技术或者表达式引擎来实现界面与业务
 
 ##### 1.10.1【必须】部署CSRF防御机制
 
-CSRF是指跨站请求伪造（Cross-site request forgery），是web常见的攻击之一。对于可重放的敏感操作请求，需部署CSRF防御机制。可参考以下两种常见的CSRF防御方式
+CSRF是指跨站请求伪造（Cross-site request forgery），是web常见的攻击之一。对于可重放的敏感操作请求，需部署CSRF防御机制。可参考以下几种常见的CSRF防御方式
 
 - 设置CSRF Token
 
@@ -687,6 +687,27 @@ CSRF是指跨站请求伪造（Cross-site request forgery），是web常见的�
 
   1. 要需要处理Referer为空的情况，当Referer为空则拒绝请求
   2. 注意避免例如qq.com.evil.com 部分匹配的情况。
+
+  ​    
+
+- 避免使用GET请求对服务端进行更改
+
+  基于GET请求的CSRF攻击成本相对较低，避免使用GET请求对服务端发起操作能够提高CSRF攻击门槛。
+
+  另外，由于在基于Referer头的防范手段中，可能为了避免对搜索引擎来源链接的“误伤”，则需要放过如下Header的请求：
+
+  ```
+  Accept: text/html
+  Method: GET
+  ```
+
+  这样这种类型的请求是暴露于攻击范围之中的。
+
+  ​    
+
+- Samesite Cookie
+
+  CSRF攻击发生的前提是被攻击者的浏览器上已经具有被攻击网站的登录凭据，如果网站的登录凭据存储在Cookie中，那么可以对Cookie的Samesite属性进行设置，避免浏览器对非同源的请求传递登录凭据，进而对被攻击网站发起有效的请求。
 
 ##### 1.10.2【必须】权限校验
 
