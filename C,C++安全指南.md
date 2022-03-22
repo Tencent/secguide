@@ -313,7 +313,7 @@ snprintf(buf, sizeof(buf), wifi_name);
 正确：
 
 ```c++
-snprinf(buf, sizeof(buf), "%s", wifi_name);
+snprintf(buf, sizeof(buf), "%s", wifi_name);
 ```
 
 关联漏洞:
