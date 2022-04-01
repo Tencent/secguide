@@ -89,11 +89,12 @@ public class MainActivity extends Activity {
 release 版本禁止在 logcat 输出信息。
 ```java
 public class MainActivity extends Activity {
-    String DEBUG = "debug_version";
-
+    boolean DEBUG = true; // 示例代码，实际场景中建议设置为全局变量
     protected void onCreate(Bundle savedInstanceState) {
         // ......
-        if (DEBUG == "debug_version") {
+	// equals() 方法比较字符串对象中的字符。而==运算符比较两个对象引用看它们是否引用相同的实例。如果要做字符串内容比较，应该用equals()，不能用if (DEBUG == "debug_version")，且写代码“debug_version”这个字符串过长容易写错，出问题也不好发现
+	// 另外，字符串比较效率比较低，不如直接用boolean
+        if (DEBUG) {
             Log.d("writelog", "start activity");
         }
         // ......
