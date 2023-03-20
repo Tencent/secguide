@@ -92,7 +92,7 @@ func (p *Packet) UnmarshalBinary(b []byte) error {
 	p.PackeyType = b[0]
 	p.PackeyVersion = b[1]
 
-	// 若长度等于2，那么不会new Data
+	// 若长度小于等于2，那么不会new Data
 	if len(b) > 2 {
 		p.Data = new(Data)
 	}
